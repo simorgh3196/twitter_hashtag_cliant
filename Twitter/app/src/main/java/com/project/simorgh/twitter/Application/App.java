@@ -1,4 +1,4 @@
-package com.project.simorgh.twitter;
+package com.project.simorgh.twitter.Application;
 
 import android.app.Application;
 import android.util.Log;

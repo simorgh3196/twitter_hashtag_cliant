@@ -1,13 +1,17 @@
-package com.project.simorgh.twitter;
+package com.project.simorgh.twitter.Activity;
 
+import android.content.Intent;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.*;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.project.simorgh.twitter.Fragment.ComposeFragment;
+import com.project.simorgh.twitter.R;
+import com.project.simorgh.twitter.Utils.TweetComparator;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
@@ -29,6 +33,8 @@ public class TimelineActivity extends AppCompatActivity implements OnRefreshList
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView listView;
+
+    private Tweet tweet;
 
     final UserTimeline userTimeline = new UserTimeline.Builder()
             .screenName(Twitter.getInstance().core.getSessionManager().getActiveSession().getUserName())
@@ -112,5 +118,22 @@ public class TimelineActivity extends AppCompatActivity implements OnRefreshList
                     }
                 }
         );
+    }
+
+    public void pushPostButton(View view) {
+
+        Intent intent = new Intent(this, ComposeActivity.class);
+        startActivity(intent);
+
+//        ComposeFragment fragment = new ComposeFragment();
+//        fragment.show(getFragmentManager(), "test");
+    }
+
+    public void pushCameraButton(View view) {
+        Toast.makeText(this, "push camera button", Toast.LENGTH_LONG).show();
+    }
+
+    public void pushGalleryButton(View view) {
+        Toast.makeText(this, "push gallery button", Toast.LENGTH_LONG).show();
     }
 }

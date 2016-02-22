@@ -1,4 +1,4 @@
-package com.project.simorgh.twitter;
+package com.project.simorgh.twitter.Utils;
 
 import com.twitter.sdk.android.core.models.Tweet;
 import java.util.Comparator;

@@ -1,4 +1,4 @@
-package com.project.simorgh.twitter;
+package com.project.simorgh.twitter.Activity;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -6,38 +6,39 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.project.simorgh.twitter.R;
+import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.*;
 import com.twitter.sdk.android.core.identity.*;
 
 
-public class MainActivity extends AppCompatActivity {
+public class LaunchActivity extends AppCompatActivity {
 
     private TwitterLoginButton loginButton;
-
+    private TwitterSession mSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(com.project.simorgh.twitter.R.layout.activity_launch);
+
+        mSession = Twitter.getInstance().core.getSessionManager().getActiveSession();
+        if (mSession.getAuthToken() != null) {
+            showTimelineActivity();
+            return;
+        }
 
         loginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
         loginButton.setCallback(new Callback<TwitterSession>() {
             @Override
             public void success(Result<TwitterSession> result) {
-                // The TwitterSession is also available through:
-                // Twitter.getInstance().core.getSessionManager().getActiveSession()
-                TwitterSession session = result.data;
-                // TODO: Remove toast and use the TwitterSession's userID
-                // with your app's user model
-                String msg = "@" + session.getUserName() + " logged in! (#" + session.getUserId() + ")";
-                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
-
-                Intent intent = new Intent(MainActivity.this, TimelineActivity.class);
-                startActivity(intent);
+                mSession = result.data;
+                showTimelineActivity();
             }
             @Override
             public void failure(TwitterException exception) {
                 Log.d("TwitterKit", "Login with Twitter failure", exception);
+                Toast.makeText(LaunchActivity.this, "接続状況を確認してください。", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -49,6 +50,15 @@ public class MainActivity extends AppCompatActivity {
         // Make sure that the loginButton hears the result from any
         // Activity that it triggered.
         loginButton.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void showTimelineActivity() {
+
+        String msg = "@" + mSession.getUserName() + " logged in!";
+        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+
+        Intent intent = new Intent(LaunchActivity.this, TimelineActivity.class);
+        startActivity(intent);
     }
 
 }
