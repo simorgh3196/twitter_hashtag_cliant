@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:orientation="vertical"
         android:fitsSystemWindows="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".Activity.ComposeActivity">
+        tools:context=".Activity.ComposeActivity"
+        android:layout_alignParentEnd="false">
 
-        <LinearLayout
+
+    <LinearLayout
             android:orientation="horizontal"
             android:fitsSystemWindows="true"
             android:layout_width="match_parent"
@@ -41,10 +45,12 @@
             android:layout_height="fill_parent"
             android:id="@+id/tweetContentText"
             android:layout_weight="1"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:editable="true"
-            android:gravity="top" />
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:hint="@string/tw__composer_hint"
+            android:gravity="top|left"
+            android:inputType="textMultiLine" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -82,7 +88,7 @@
                     android:layout_height="wrap_content"
                     android:text="140"
                     android:id="@+id/lastCountText"
-                    android:textColor="#b0b0b0" />
+                    android:textColor="#b0b0b0"/>
 
                 <Button
                     android:layout_width="wrap_content"
@@ -97,10 +103,11 @@
                     android:background="#5289ff"
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
-                    android:onClick="pushTweetButton" />
+                    android:onClick="pushTweetButton"/>
 
             </LinearLayout>
         </LinearLayout>
 
-    </LinearLayout>
+</LinearLayout>
 
+</RelativeLayout>

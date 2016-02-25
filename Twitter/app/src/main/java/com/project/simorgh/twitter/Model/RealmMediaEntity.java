@@ -1,32 +1,51 @@
 package com.project.simorgh.twitter.Model;
 
-import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-/**
- * Created by TomoyaHayakawa on 16/02/20.
- */
+
 public class RealmMediaEntity extends RealmObject {
 
     @PrimaryKey
-    private long id;
+    private String entity_id; // (status_id):(media_url)[(start_index)-(end_index)]
+
+    private long status_id;
+    private RealmTweetEntities tweet_entity;
 
     private String media_url;
     private String media_url_https;
-    // private MediaEntity.Sizes sizes;
+
     private int size_w;
     private int size_h;
     private String resize;
-    private long source_status_id;
     private String type;
 
-    public long getId() {
-        return id;
+    private int start_index;
+    private int end_index;
+
+
+    public String getEntity_id() {
+        return entity_id;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setEntity_id(String entity_id) {
+        this.entity_id = entity_id;
+    }
+
+    public long getStatus_id() {
+        return status_id;
+    }
+
+    public void setStatus_id(long status_id) {
+        this.status_id = status_id;
+    }
+
+    public RealmTweetEntities getTweet_entity() {
+        return tweet_entity;
+    }
+
+    public void setTweet_entity(RealmTweetEntities tweet_entity) {
+        this.tweet_entity = tweet_entity;
     }
 
     public String getMedia_url() {
@@ -69,19 +88,27 @@ public class RealmMediaEntity extends RealmObject {
         this.resize = resize;
     }
 
-    public long getSource_status_id() {
-        return source_status_id;
-    }
-
-    public void setSource_status_id(long source_status_id) {
-        this.source_status_id = source_status_id;
-    }
-
     public String getType() {
         return type;
     }
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public int getStart_index() {
+        return start_index;
+    }
+
+    public void setStart_index(int start_index) {
+        this.start_index = start_index;
+    }
+
+    public int getEnd_index() {
+        return end_index;
+    }
+
+    public void setEnd_index(int end_index) {
+        this.end_index = end_index;
     }
 }

@@ -47,8 +47,7 @@ public class LaunchActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // Make sure that the loginButton hears the result from any
-        // Activity that it triggered.
+
         loginButton.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -57,7 +56,7 @@ public class LaunchActivity extends AppCompatActivity {
         String msg = "@" + mSession.getUserName() + " logged in!";
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
 
-        Intent intent = new Intent(LaunchActivity.this, TimelineActivity.class);
+        Intent intent = new Intent(LaunchActivity.this, RootPagerActivity.class);
         startActivity(intent);
     }
 

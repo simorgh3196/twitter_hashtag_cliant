@@ -1,17 +1,35 @@
 package com.project.simorgh.twitter.Model;
 
-import java.util.List;
-
 import io.realm.RealmList;
 import io.realm.RealmObject;
-
+import io.realm.annotations.PrimaryKey;
 
 public class RealmTweetEntities extends RealmObject {
+
+    @PrimaryKey
+    private long status_id;
+    private RealmTweet tweet;
 
     private RealmList<RealmUrlEntity> urls;
     private RealmList<RealmMentionEntity> user_mentions;
     private RealmList<RealmMediaEntity> media;
     private RealmList<RealmHashtagEntity> hashtags;
+
+    public long getStatus_id() {
+        return status_id;
+    }
+
+    public void setStatus_id(long status_id) {
+        this.status_id = status_id;
+    }
+
+    public RealmTweet getTweet() {
+        return tweet;
+    }
+
+    public void setTweet(RealmTweet tweet) {
+        this.tweet = tweet;
+    }
 
     public RealmList<RealmUrlEntity> getUrls() {
         return urls;
