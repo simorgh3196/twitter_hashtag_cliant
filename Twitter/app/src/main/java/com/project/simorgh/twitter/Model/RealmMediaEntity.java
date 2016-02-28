@@ -7,11 +7,11 @@ import io.realm.annotations.PrimaryKey;
 public class RealmMediaEntity extends RealmObject {
 
     @PrimaryKey
-    private String entity_id; // (status_id):(media_url)[(start_index)-(end_index)]
+    private String entity_id; // (status_id):(media_id)[(start_index)-(end_index)]
 
-    private long status_id;
     private RealmTweetEntities tweet_entity;
 
+    private long media_id;
     private String media_url;
     private String media_url_https;
 
@@ -32,20 +32,20 @@ public class RealmMediaEntity extends RealmObject {
         this.entity_id = entity_id;
     }
 
-    public long getStatus_id() {
-        return status_id;
-    }
-
-    public void setStatus_id(long status_id) {
-        this.status_id = status_id;
-    }
-
     public RealmTweetEntities getTweet_entity() {
         return tweet_entity;
     }
 
     public void setTweet_entity(RealmTweetEntities tweet_entity) {
         this.tweet_entity = tweet_entity;
+    }
+
+    public long getMedia_id() {
+        return media_id;
+    }
+
+    public void setMedia_id(long media_id) {
+        this.media_id = media_id;
     }
 
     public String getMedia_url() {

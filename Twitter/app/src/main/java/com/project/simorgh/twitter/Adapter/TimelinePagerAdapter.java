@@ -19,7 +19,7 @@ public class TimelinePagerAdapter extends FragmentPagerAdapter {
         super(manager);
         _fragments = new ArrayList<>();
         _fragments.add(TimelineFragment.newInstance(null));
-        _fragments.add(TimelineFragment.newInstance(null));
+        _fragments.add(TimelineFragment.newInstance("test"));
     }
 
     @Override
@@ -38,14 +38,9 @@ public class TimelinePagerAdapter extends FragmentPagerAdapter {
         _fragments.add(fragment);
     }
 
-    public String getTitle(int position) {
+    public String getItemTitle(int position) {
 
-        String hashtag = _fragments.get(position).getHashtag();
-        if (hashtag == null) {
-            return "Home";
-        }
-
-        return "#" + hashtag;
+        return _fragments.get(position).getTitle();
     }
 
 }

@@ -23,7 +23,7 @@ public class LaunchActivity extends AppCompatActivity {
         setContentView(com.project.simorgh.twitter.R.layout.activity_launch);
 
         mSession = Twitter.getInstance().core.getSessionManager().getActiveSession();
-        if (mSession.getAuthToken() != null) {
+        if (mSession != null && mSession.getAuthToken() != null) {
             showTimelineActivity();
             return;
         }

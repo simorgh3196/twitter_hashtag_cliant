@@ -12,6 +12,7 @@ public class RealmTweet extends RealmObject {
     private long   user_id;
     private String screen_name;
     private String name;
+    private String profile_image_url;
     private String text;
     private String created_at;
     private String lang;
@@ -62,6 +63,14 @@ public class RealmTweet extends RealmObject {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getProfile_image_url() {
+        return profile_image_url;
+    }
+
+    public void setProfile_image_url(String profile_image_url) {
+        this.profile_image_url = profile_image_url;
     }
 
     public String getText() {

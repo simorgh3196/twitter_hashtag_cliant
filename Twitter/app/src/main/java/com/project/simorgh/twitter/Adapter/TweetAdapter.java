@@ -2,9 +2,7 @@ package com.project.simorgh.twitter.Adapter;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.*;
@@ -14,24 +12,19 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.project.simorgh.twitter.Activity.ComposeActivity;
 import com.project.simorgh.twitter.R;
+import com.project.simorgh.twitter.Utils.ThumbnailImageView;
 import com.project.simorgh.twitter.Utils.TwitterUtils;
-import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.models.MediaEntity;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.tweetui.internal.TweetMediaUtils;
 
-import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-
-import io.realm.processor.Utils;
 
 
 public class TweetAdapter extends BaseAdapter {
@@ -39,25 +32,55 @@ public class TweetAdapter extends BaseAdapter {
     Context _context;
     LayoutInflater _layoutInflater = null;
     List<Tweet> _tweets;
+    String _hashtag = null;
 
-    public TweetAdapter(Context context) {
+
+    public TweetAdapter(Context context, String hashtag) {
         super();
+        init(context);
+        _hashtag = hashtag;
+    }
+
+    private void init(Context context) {
 
         _context = context;
-        _tweets = new ArrayList();
+        _tweets = new ArrayList<>();
         _layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public void setTweets(List<Tweet> tweets) {
-        this._tweets = tweets;
-    }
+//    public void setTweets(List<Tweet> tweets) {
+//        this._tweets = filteringTweet(tweets);
+//    }
 
-    public void addTweets(List<Tweet> tweets) {
+    public int addTweets(List<Tweet> tweets) {
 
-        List<Tweet> newTweets = new ArrayList<>();
-        newTweets.addAll(tweets);
+        ArrayList<Tweet> newTweets = new ArrayList<>();
+
+        newTweets.addAll(filteringTweet(tweets));
         newTweets.addAll(_tweets);
         _tweets = newTweets;
+
+//        RealmUtils.saveTweets(_context, newTweets);
+
+        return newTweets.size();
+    }
+
+    private List<Tweet> filteringTweet(List<Tweet> tweets) {
+
+        if (_hashtag != null) {
+            List<Tweet> list = new ArrayList<>(tweets);
+
+            for (Iterator<Tweet> it = list.iterator(); it.hasNext();) {
+                Tweet tweet = it.next();
+
+                if (!tweet.text.contains("#"+_hashtag)) {
+                    it.remove();
+                }
+
+            }
+            return list;
+        }
+        return tweets;
     }
 
     public long getLatestTweetId() {
@@ -115,34 +138,40 @@ public class TweetAdapter extends BaseAdapter {
         ImageButton icon = ((ImageButton)convertView.findViewById(R.id.icon_image_button));
         Glide.with(_context).load(tweet.user.profileImageUrl).fitCenter().thumbnail(0.8f).into(icon);
 
-        ImageButton image1 = (ImageButton)convertView.findViewById(R.id.imageButton1);
-        ImageButton image2 = (ImageButton)convertView.findViewById(R.id.imageButton2);
-        ImageButton image3 = (ImageButton)convertView.findViewById(R.id.imageButton3);
-        ImageButton image4 = (ImageButton)convertView.findViewById(R.id.imageButton4);
+        ThumbnailImageView image1 = (ThumbnailImageView)convertView.findViewById(R.id.imageButton1);
+        ThumbnailImageView image2 = (ThumbnailImageView)convertView.findViewById(R.id.imageButton2);
+        ThumbnailImageView image3 = (ThumbnailImageView)convertView.findViewById(R.id.imageButton3);
+        ThumbnailImageView image4 = (ThumbnailImageView)convertView.findViewById(R.id.imageButton4);
         LinearLayout layout1 = (LinearLayout)convertView.findViewById(R.id.LinearLayout1);
         LinearLayout layout2 = (LinearLayout)convertView.findViewById(R.id.LinearLayout2);
         LinearLayout layout3 = (LinearLayout)convertView.findViewById(R.id.LinearLayout3);
 
         if (TweetMediaUtils.hasPhoto(tweet)) {
-
             List<MediaEntity> entities = tweet.extendedEtities.media;
-
             OnClickListener listener = new OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    ImageButton imageButton = (ImageButton) v;
+                    ThumbnailImageView imageButton = (ThumbnailImageView) v;
                     if (imageButton == null) {
                         return;
                     }
 
-                    Bitmap bitmap = ((BitmapDrawable)imageButton.getDrawable()).getBitmap();
+                    String url = imageButton.getImageUrl();
+                    if (url == null) {
+                        Log.d("Debug", "imageUrl is null");
+                        return;
+                    }
+                    Log.d("Thumbnail url:", url);
 
                     //Bitmap image
                     ImageView iv = new ImageView(_context);
-                    iv.setImageBitmap(bitmap);
                     iv.setScaleType(ImageView.ScaleType.FIT_XY);
                     iv.setAdjustViewBounds(true);
+                    iv.setLayoutParams(new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT));
+                    Glide.with(_context).load(url).asBitmap().into(iv);
 
                     Dialog dialog = new Dialog(_context);
                     dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
@@ -167,7 +196,8 @@ public class TweetAdapter extends BaseAdapter {
                     image3.setVisibility(View.GONE);
                     image4.setVisibility(View.GONE);
                     layout3.setVisibility(View.GONE);
-                    Glide.with(_context).load(entities.get(0).mediaUrl).asBitmap().centerCrop().into(image1);
+                    Glide.with(_context).load(entities.get(0).mediaUrl).asBitmap().into(image1);
+                    image1.setImageUrl(entities.get(0).mediaUrl);
                     break;
 
                 case 2:
@@ -175,8 +205,10 @@ public class TweetAdapter extends BaseAdapter {
                     image3.setVisibility(View.VISIBLE);
                     image4.setVisibility(View.GONE);
                     layout3.setVisibility(View.VISIBLE);
-                    Glide.with(_context).load(entities.get(0).mediaUrl).asBitmap().centerCrop().into(image1);
-                    Glide.with(_context).load(entities.get(1).mediaUrl).asBitmap().centerCrop().into(image3);
+                    Glide.with(_context).load(entities.get(0).mediaUrl).asBitmap().into(image1);
+                    Glide.with(_context).load(entities.get(1).mediaUrl).asBitmap().into(image3);
+                    image1.setImageUrl(entities.get(0).mediaUrl);
+                    image3.setImageUrl(entities.get(1).mediaUrl);
                     break;
 
                 case 3:
@@ -184,9 +216,12 @@ public class TweetAdapter extends BaseAdapter {
                     image3.setVisibility(View.VISIBLE);
                     image4.setVisibility(View.VISIBLE);
                     layout3.setVisibility(View.VISIBLE);
-                    Glide.with(_context).load(entities.get(0).mediaUrl).asBitmap().centerCrop().into(image1);
-                    Glide.with(_context).load(entities.get(1).mediaUrl).asBitmap().centerCrop().into(image3);
-                    Glide.with(_context).load(entities.get(2).mediaUrl).asBitmap().centerCrop().into(image4);
+                    Glide.with(_context).load(entities.get(0).mediaUrl).asBitmap().into(image1);
+                    Glide.with(_context).load(entities.get(1).mediaUrl).asBitmap().into(image3);
+                    Glide.with(_context).load(entities.get(2).mediaUrl).asBitmap().into(image4);
+                    image1.setImageUrl(entities.get(0).mediaUrl);
+                    image3.setImageUrl(entities.get(1).mediaUrl);
+                    image4.setImageUrl(entities.get(2).mediaUrl);
                     break;
 
                 case 4:
@@ -194,10 +229,14 @@ public class TweetAdapter extends BaseAdapter {
                     image3.setVisibility(View.VISIBLE);
                     image4.setVisibility(View.VISIBLE);
                     layout3.setVisibility(View.VISIBLE);
-                    Glide.with(_context).load(entities.get(0).mediaUrl).asBitmap().centerCrop().into(image1);
-                    Glide.with(_context).load(entities.get(2).mediaUrl).asBitmap().centerCrop().into(image2);
-                    Glide.with(_context).load(entities.get(1).mediaUrl).asBitmap().centerCrop().into(image3);
-                    Glide.with(_context).load(entities.get(3).mediaUrl).asBitmap().centerCrop().into(image4);
+                    Glide.with(_context).load(entities.get(0).mediaUrl).asBitmap().into(image1);
+                    Glide.with(_context).load(entities.get(2).mediaUrl).asBitmap().into(image2);
+                    Glide.with(_context).load(entities.get(1).mediaUrl).asBitmap().into(image3);
+                    Glide.with(_context).load(entities.get(3).mediaUrl).asBitmap().into(image4);
+                    image1.setImageUrl(entities.get(0).mediaUrl);
+                    image2.setImageUrl(entities.get(2).mediaUrl);
+                    image3.setImageUrl(entities.get(1).mediaUrl);
+                    image4.setImageUrl(entities.get(3).mediaUrl);
                     break;
 
                 default: break;

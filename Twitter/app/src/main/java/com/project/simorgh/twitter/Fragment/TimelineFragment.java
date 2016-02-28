@@ -15,7 +15,6 @@ import android.widget.Toast;
 import com.project.simorgh.twitter.Activity.RootPagerActivity;
 import com.project.simorgh.twitter.Adapter.TweetAdapter;
 import com.project.simorgh.twitter.R;
-import com.project.simorgh.twitter.Utils.TweetComparator;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterApiClient;
@@ -24,8 +23,6 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.core.services.StatusesService;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -35,7 +32,7 @@ public class TimelineFragment extends Fragment implements OnRefreshListener {
     private ListView _listView;
     private TweetAdapter _tweetAdapter = null;
 
-    private String hashtag = null;
+    private String _hashtag = null;
 
 
     public static TimelineFragment newInstance(String hashtag) {
@@ -46,10 +43,6 @@ public class TimelineFragment extends Fragment implements OnRefreshListener {
         fragment.setArguments(bundle);
 
         return fragment;
-    }
-
-    public String getHashtag() {
-        return hashtag;
     }
 
     @Override
@@ -63,7 +56,7 @@ public class TimelineFragment extends Fragment implements OnRefreshListener {
 
         Bundle bundle = getArguments();
         if (bundle != null) {
-//            hashtag = bundle.getString("hashtag");
+            _hashtag = bundle.getString("hashtag");
         }
 
         View fragment = inflater.inflate(R.layout.fragment_timeline, container, false);
@@ -99,16 +92,26 @@ public class TimelineFragment extends Fragment implements OnRefreshListener {
 
         RootPagerActivity activity = (RootPagerActivity) context;
         if (activity != null) {
-            if (hashtag == null) {
+            if (_hashtag == null) {
                 activity.changeTitle("Home");
+            }else {
+                activity.changeTitle("#" + _hashtag);
             }
-            activity.changeTitle("#" + hashtag);
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+    public String getTitle() {
+
+        if (_hashtag == null) {
+            return "Home";
+        }else {
+            return "#" + _hashtag;
+        }
     }
 
 
@@ -119,42 +122,54 @@ public class TimelineFragment extends Fragment implements OnRefreshListener {
 
         if (_tweetAdapter != null) {
             if (_tweetAdapter.getCount() > 0) {
-                latestId = _tweetAdapter.getLatestTweetId();
+                latestId = _tweetAdapter.getLatestTweetId()+1;
             }
         }
 
         TwitterApiClient twitterApiClient = TwitterCore.getInstance().getApiClient();
         StatusesService statusesService = twitterApiClient.getStatusesService();
 
-        statusesService.homeTimeline(20, latestId, null, false, false, false, false,
+        statusesService.homeTimeline(200, latestId, null, false, false, false, false,
                 new Callback<List<Tweet>>() {
                     @Override
                     public void success(Result<List<Tweet>> listResult) {
 
                         if (_tweetAdapter == null) {
-                            _tweetAdapter = new TweetAdapter(getActivity());
-                            _tweetAdapter.setTweets(listResult.data);
+                            _tweetAdapter = new TweetAdapter(getActivity(), _hashtag);
+                            _tweetAdapter.addTweets(listResult.data);
                             _listView.setAdapter(_tweetAdapter);
-                        }
-                        else {
+                        } else {
+                            int oldSize = _tweetAdapter.getCount();
                             _tweetAdapter.addTweets(listResult.data);
                             _tweetAdapter.notifyDataSetChanged();
-
-                            int position = _listView.getFirstVisiblePosition() + listResult.data.size();
-                            int yOffset = _listView.getChildAt(0).getTop();
-                            _listView.setSelectionFromTop(position, yOffset);
+                            int newSize = _tweetAdapter.getCount();
+                            backToPreviousPosition(newSize - oldSize);
                         }
 
                         if (_swipeRefreshLayout.isRefreshing()) {
                             _swipeRefreshLayout.setRefreshing(false);
                         }
+
+                        if (_tweetAdapter.getCount() == 0) {
+
+                        }
                     }
 
                     @Override
                     public void failure(TwitterException e) {
-                        Toast.makeText(getActivity(), "ツイート取得失敗", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "ツイート取得失敗\n"+e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                        e.printStackTrace();
                     }
                 }
         );
+    }
+
+    private void backToPreviousPosition(int newListSize) {
+
+        if (_tweetAdapter.getCount() > 10) {
+            int position = _listView.getFirstVisiblePosition() + newListSize;
+            int yOffset = _listView.getChildAt(0).getTop();
+            _listView.setSelectionFromTop(position, yOffset);
+        }
     }
 }

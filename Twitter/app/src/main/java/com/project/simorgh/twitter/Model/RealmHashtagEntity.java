@@ -9,7 +9,6 @@ public class RealmHashtagEntity extends RealmObject {
     @PrimaryKey
     private String entity_id; // (status_id):(text)[(start_index)-(end_index)]
 
-    private long status_id;
     private RealmTweetEntities tweet_entity;
 
     private String text;
@@ -22,14 +21,6 @@ public class RealmHashtagEntity extends RealmObject {
 
     public void setEntity_id(String entity_id) {
         this.entity_id = entity_id;
-    }
-
-    public long getStatus_id() {
-        return status_id;
-    }
-
-    public void setStatus_id(long status_id) {
-        this.status_id = status_id;
     }
 
     public RealmTweetEntities getTweet_entity() {
